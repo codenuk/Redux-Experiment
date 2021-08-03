@@ -1,19 +1,33 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-const setUsername = (value: any) => {
+const setUsername = (value: string): { type: string; username: string } => {
   return {
-    type: 'SETUSERNAME',
+    type: 'SET_USERNAME',
     username: value,
   }
 }
 
-const setPassword = (value: any) => ({
-  type: 'SETPASSWORD',
+const setPassword = (value: string): { type: string; password: string } => ({
+  type: 'SET_PASSWORD',
   password: value,
+})
+
+const setLogin = (username: string, password: string): { type: string; username: string; password: string } => ({
+  type: 'SET_LOGIN',
+  username: username,
+  password: password,
+})
+
+const setSetToken = (): { type: string } => ({
+  type: 'SET_TOKEN',
+})
+
+const setLogout = (): { type: string } => ({
+  type: 'SET_LOGOUT',
 })
 
 export default {
   setUsername,
   setPassword,
+  setLogin,
+  setSetToken,
+  setLogout,
 }

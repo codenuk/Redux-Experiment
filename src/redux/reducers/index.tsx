@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import testReducer, { IInterface } from './test'
+import testReducer, { IInitialState } from './test'
 
-interface ICombineReducers {
-  testReducer: IInterface
+export interface ICombineReducers {
+  testReducer: IInitialState
 }
 
 const rootReducer = combineReducers<ICombineReducers>({
