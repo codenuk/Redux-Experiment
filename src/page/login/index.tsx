@@ -1,14 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './index.css'
+// import HookRefeshToken from '../../hook/refeshToken'
 import { useSelector, useDispatch } from 'react-redux'
 import allAction from '../../redux/actions/index'
 import { Redirect } from 'react-router-dom'
 import { ICombineReducers } from '../../redux/reducers'
 import axios from 'axios'
 
-const LoginPage: React.FC = (): JSX.Element => {
+const LoginPage: React.FC = (props: any): JSX.Element => {
   const stateRedux = useSelector((state: ICombineReducers) => state.testReducer)
   const dispatch = useDispatch()
+
+  // HookRefeshToken(props)
+
+  useEffect(() => {
+    console.log('stateRedux page main', stateRedux)
+  }, [])
 
   const handleSubmit = () => {
     const data = {

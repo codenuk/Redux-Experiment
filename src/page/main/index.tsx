@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './index.css'
 import HookRefeshToken from '../../hook/refeshToken'
 import { useSelector, useDispatch } from 'react-redux'
@@ -12,11 +12,15 @@ const App: React.FC = (props: any): JSX.Element => {
 
   HookRefeshToken(props)
 
+  useEffect(() => {
+    console.log('stateRedux page login', stateRedux)
+  }, [])
+
   const handleLogout = () => {
     dispatch(allAction.testAction.setLogout())
   }
 
-  if (!stateRedux.isLogin) {
+  if (!localStorage.getItem('accessToken')) {
     return <Redirect to="/" />
   }
   return (

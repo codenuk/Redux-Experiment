@@ -17,26 +17,29 @@ const HookRefeshToken = (props: any): void => {
         const localStorageToken = localStorage.getItem('accessToken') || ''
         const localStorageRefreshToken = localStorage.getItem('refreshToken') || ''
 
-        if (res.response.data?.message === 'Unauthorized') {
-          // ยิงแล้ว err กลับมา ให้ทำการ call API refreshToken เพื่อขอ accessToken and refreshToken ใหม่
-          const resultPostRefreshToken = postRefreshToken(localStorageRefreshToken)
-          resultPostRefreshToken
-            .then((resRefresh) => {
-              console.log('>>> need refresh token')
-              const tokenAfterCallAPI = resRefresh.data.accessToken
-              const refreshTokenAfterCallAPI = resRefresh.data.refreshToken
-              localStorage.setItem('accessToken', tokenAfterCallAPI)
-              localStorage.setItem('refreshToken', refreshTokenAfterCallAPI)
-              dispatch(allAction.testAction.setSetToken(tokenAfterCallAPI, refreshTokenAfterCallAPI))
-            })
-            .catch((errRefresh) => {
-              console.log('>>> need login again')
-              console.log('errRefresh', errRefresh)
-              dispatch(allAction.testAction.setLogout())
-            })
-        } else {
+        if (res.data) {
           console.log('>>> not need refresh token')
           dispatch(allAction.testAction.setSetToken(localStorageToken, localStorageRefreshToken))
+        }
+        if (res.response) {
+          if (res.response.data?.message === 'Unauthorized') {
+            // ยิงแล้ว err กลับมา ให้ทำการ call API refreshToken เพื่อขอ accessToken and refreshToken ใหม่
+            const resultPostRefreshToken = postRefreshToken(localStorageRefreshToken)
+            resultPostRefreshToken
+              .then((resRefresh) => {
+                console.log('>>> need refresh token', resRefresh)
+                const tokenAfterCallAPI = resRefresh.data.accessToken
+                const refreshTokenAfterCallAPI = resRefresh.data.refreshToken
+                localStorage.setItem('accessToken', tokenAfterCallAPI)
+                localStorage.setItem('refreshToken', refreshTokenAfterCallAPI)
+                dispatch(allAction.testAction.setSetToken(tokenAfterCallAPI, refreshTokenAfterCallAPI))
+              })
+              .catch((errRefresh) => {
+                console.log('>>> need login again')
+                console.log('errRefresh', errRefresh)
+                dispatch(allAction.testAction.setLogout())
+              })
+          }
         }
       })
       .catch((err) => {
