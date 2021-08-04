@@ -10,14 +10,24 @@ const setPassword = (value: string): { type: string; password: string } => ({
   password: value,
 })
 
-const setLogin = (username: string, password: string): { type: string; username: string; password: string } => ({
-  type: 'SET_LOGIN',
-  username: username,
-  password: password,
-})
+const setLogin = (
+  accessToken: string,
+  refreshToken: string,
+): { type: string; accessToken: string; refreshToken: string } => {
+  return {
+    type: 'SET_LOGIN',
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  }
+}
 
-const setSetToken = (): { type: string } => ({
+const setSetToken = (
+  accessToken: string,
+  refreshToken: string,
+): { type: string; accessToken: string; refreshToken: string } => ({
   type: 'SET_TOKEN',
+  accessToken: accessToken,
+  refreshToken: refreshToken,
 })
 
 const setLogout = (): { type: string } => ({

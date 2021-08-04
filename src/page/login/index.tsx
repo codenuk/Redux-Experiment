@@ -1,23 +1,31 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import './index.css'
 import { useSelector, useDispatch } from 'react-redux'
 import allAction from '../../redux/actions/index'
 import { Redirect } from 'react-router-dom'
-import HookRefeshToken from '../../hook/refeshToken'
 import { ICombineReducers } from '../../redux/reducers'
+import axios from 'axios'
 
 const LoginPage: React.FC = (): JSX.Element => {
   const stateRedux = useSelector((state: ICombineReducers) => state.testReducer)
   const dispatch = useDispatch()
 
-  HookRefeshToken()
-
-  useEffect(() => {
-    console.log('stateRedux', stateRedux)
-  }, [stateRedux])
-
   const handleSubmit = () => {
-    dispatch(allAction.testAction.setLogin(stateRedux.username, stateRedux.password))
+    const data = {
+      username: stateRedux.username,
+      password: stateRedux.password,
+    }
+
+    axios
+      .post('https://jum716bkef.execute-api.ap-southeast-1.amazonaws.com/prod/api/auth/login', data)
+      .then((res) => {
+        localStorage.setItem('accessToken', res.data.accessToken)
+        localStorage.setItem('refreshToken', res.data.refreshToken)
+        dispatch(allAction.testAction.setLogin(res.data.accessToken, res.data.refreshToken))
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
   if (stateRedux.isLogin) {

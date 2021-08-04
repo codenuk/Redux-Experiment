@@ -1,16 +1,88 @@
 import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import allAction from '../redux/actions/index'
-// import { ICombineReducers } from '../redux/reducers'
+import { ICombineReducers } from '../redux/reducers'
+import axios from 'axios'
+const urlGQL = 'https://jum716bkef.execute-api.ap-southeast-1.amazonaws.com/prod/api/graphql'
 
-const HookRefeshToken = (): void => {
-  // const stateRedux = useSelector((state: ICombineReducers) => state.testReducer)
+const HookRefeshToken = (props: any): void => {
+  const stateRedux = useSelector((state: ICombineReducers) => state.testReducer)
   const dispatch = useDispatch()
 
-  // set token and refreshToken from localStorage to redux if it have
+  // set accessToken and refreshToken from localStorage to redux if it have
   useEffect(() => {
-    dispatch(allAction.testAction.setSetToken())
+    const resultGetMan = getMan(stateRedux.accessToken)
+    resultGetMan
+      .then((res) => {
+        const localStorageToken = localStorage.getItem('accessToken') || ''
+        const localStorageRefreshToken = localStorage.getItem('refreshToken') || ''
+
+        if (res.response.data?.message === 'Unauthorized') {
+          // ยิงแล้ว err กลับมา ให้ทำการ call API refreshToken เพื่อขอ accessToken and refreshToken ใหม่
+          const resultPostRefreshToken = postRefreshToken(localStorageRefreshToken)
+          resultPostRefreshToken
+            .then((resRefresh) => {
+              console.log('>>> need refresh token')
+              const tokenAfterCallAPI = resRefresh.data.accessToken
+              const refreshTokenAfterCallAPI = resRefresh.data.refreshToken
+              localStorage.setItem('accessToken', tokenAfterCallAPI)
+              localStorage.setItem('refreshToken', refreshTokenAfterCallAPI)
+              dispatch(allAction.testAction.setSetToken(tokenAfterCallAPI, refreshTokenAfterCallAPI))
+            })
+            .catch((errRefresh) => {
+              console.log('>>> need login again')
+              console.log('errRefresh', errRefresh)
+              dispatch(allAction.testAction.setLogout())
+            })
+        } else {
+          console.log('>>> not need refresh token')
+          dispatch(allAction.testAction.setSetToken(localStorageToken, localStorageRefreshToken))
+        }
+      })
+      .catch((err) => {
+        console.log('err', err.response)
+      })
   }, [])
 }
 
 export default HookRefeshToken
+
+const getMan = async (accessToken: string) => {
+  try {
+    const q = `
+      query Query {
+        man
+      }
+    `
+    const response = await axios({
+      url: urlGQL,
+      method: 'post',
+      data: {
+        query: q,
+        variables: {},
+      },
+      headers: {
+        Authorization: accessToken,
+      },
+    })
+
+    return response
+  } catch (error) {
+    return error
+  }
+}
+
+const postRefreshToken = async (propsRefreshToken: string) => {
+  try {
+    const data = {
+      refreshToken: propsRefreshToken,
+    }
+    const response = await axios.post(
+      'https://jum716bkef.execute-api.ap-southeast-1.amazonaws.com/prod/api/auth/refreshToken',
+      data,
+    )
+    return response
+  } catch (error) {
+    return error
+  }
+}

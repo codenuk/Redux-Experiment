@@ -6,11 +6,11 @@ import allAction from '../../redux/actions/index'
 import { Redirect } from 'react-router-dom'
 import { ICombineReducers } from '../../redux/reducers'
 
-const App: React.FC = (): JSX.Element => {
+const App: React.FC = (props: any): JSX.Element => {
   const stateRedux = useSelector((state: ICombineReducers) => state.testReducer)
   const dispatch = useDispatch()
 
-  HookRefeshToken()
+  HookRefeshToken(props)
 
   const handleLogout = () => {
     dispatch(allAction.testAction.setLogout())
